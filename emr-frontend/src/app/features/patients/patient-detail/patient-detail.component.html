@@ -75,7 +75,7 @@
 
     <div class="p-4 bg-white">
       <!-- Executive Assessment Paragraph -->
-      <div class="executive-box p-3 rounded-3 mb-4 border d-flex align-items-start gap-3" style="background: #f8fafc; border-color: #e2e8f0;">
+      <div class="executive-box p-3 rounded-3 mb-0 border d-flex align-items-start gap-3" style="background: #f8fafc; border-color: #e2e8f0;">
         <i class="pi pi-info-circle text-primary fs-5 mt-1 flex-shrink-0"></i>
         <div>
           <h6 class="fw-bold mb-1 text-dark fs-7">Executive Clinical Snapshot:</h6>
@@ -83,71 +83,6 @@
         </div>
       </div>
 
-      <!-- 3-Column Highlights Grid -->
-      <div class="row g-3">
-        <!-- Active Medications -->
-        <div class="col-12 col-lg-4">
-          <div class="summary-col-card p-3 rounded-3 border h-100" style="background: #ffffff; border-color: #e1e8f0;">
-            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-              <i class="pi pi-prescription text-success fs-6"></i>
-              <h6 class="mb-0 fw-bold fs-7 text-dark">Active Medications Regimen</h6>
-              <span class="badge bg-success bg-opacity-10 text-success ms-auto font-semibold">{{ summary.activeMedications?.length || 0 }}</span>
-            </div>
-            <div *ngIf="summary.activeMedications?.length > 0; else noMeds" class="d-flex flex-column gap-2" style="max-height: 180px; overflow-y: auto;">
-              <div *ngFor="let med of summary.activeMedications.slice(0, 4)" class="p-2 rounded-2 border-start border-3 border-success bg-light text-xs">
-                <div class="fw-bold text-dark">{{ med.medicineName }}</div>
-                <div class="text-muted">{{ med.dosage || 'Standard' }} • {{ med.frequency || 'Regular' }}</div>
-              </div>
-            </div>
-            <ng-template #noMeds>
-              <p class="text-muted text-xs mb-0 fst-italic">No active medications extracted from prescriptions yet.</p>
-            </ng-template>
-          </div>
-        </div>
-
-        <!-- Radiology / MRI Impressions -->
-        <div class="col-12 col-lg-4">
-          <div class="summary-col-card p-3 rounded-3 border h-100" style="background: #ffffff; border-color: #e1e8f0;">
-            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-              <i class="pi pi-camera text-primary fs-6"></i>
-              <h6 class="mb-0 fw-bold fs-7 text-dark">MRI & Scan Impressions</h6>
-              <span class="badge bg-primary bg-opacity-10 text-primary ms-auto font-semibold">{{ summary.radiologyHighlights?.length || 0 }}</span>
-            </div>
-            <div *ngIf="summary.radiologyHighlights?.length > 0; else noRad" class="d-flex flex-column gap-2" style="max-height: 180px; overflow-y: auto;">
-              <div *ngFor="let rad of summary.radiologyHighlights.slice(0, 3)" class="p-2 rounded-2 border-start border-3 border-primary bg-light text-xs">
-                <div class="fw-bold text-dark mb-1">Radiology Impression:</div>
-                <div class="text-secondary text-truncate-3" style="line-height: 1.4;">{{ rad.impressionText }}</div>
-              </div>
-            </div>
-            <ng-template #noRad>
-              <p class="text-muted text-xs mb-0 fst-italic">No radiology scan reports uploaded yet.</p>
-            </ng-template>
-          </div>
-        </div>
-
-        <!-- Diagnostic / Lab Markers -->
-        <div class="col-12 col-lg-4">
-          <div class="summary-col-card p-3 rounded-3 border h-100" style="background: #ffffff; border-color: #e1e8f0;">
-            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-              <i class="pi pi-chart-bar text-warning fs-6"></i>
-              <h6 class="mb-0 fw-bold fs-7 text-dark">Diagnostic & Lab Markers</h6>
-              <span class="badge bg-warning bg-opacity-10 text-dark ms-auto font-semibold">{{ summary.labHighlights?.length || 0 }}</span>
-            </div>
-            <div *ngIf="summary.labHighlights?.length > 0; else noLabs" class="d-flex flex-column gap-2" style="max-height: 180px; overflow-y: auto;">
-              <div *ngFor="let lab of summary.labHighlights.slice(0, 4)" class="p-2 rounded-2 d-flex justify-content-between align-items-center bg-light text-xs" [ngClass]="lab.isAbnormal || lab.status.includes('High') || lab.status.includes('Positive') ? 'border-start border-3 border-danger' : 'border-start border-3 border-secondary'">
-                <div>
-                  <div class="fw-bold text-dark">{{ lab.testName }}</div>
-                  <div class="text-muted">{{ lab.observedValue }} {{ lab.unit }}</div>
-                </div>
-                <span class="badge px-2 py-1" [ngClass]="lab.isAbnormal || lab.status.includes('High') || lab.status.includes('Positive') ? 'bg-danger text-white' : 'bg-secondary bg-opacity-10 text-secondary'">{{ lab.status }}</span>
-              </div>
-            </div>
-            <ng-template #noLabs>
-              <p class="text-muted text-xs mb-0 fst-italic">No lab test markers on file.</p>
-            </ng-template>
-          </div>
-        </div>
-      </div>
     </div>
   </p-card>
 

@@ -1,76 +1,107 @@
 <div class="emr-login-page">
-  <!-- Background ambient glows -->
-  <div class="emr-login-glow emr-login-glow--1"></div>
-  <div class="emr-login-glow emr-login-glow--2"></div>
 
-  <div class="emr-login-container">
-    <div class="emr-login-card">
-      
-      <!-- Brand Header -->
-      <div class="emr-login-header">
-        <h2 class="emr-login-title">Welcome Back</h2>
-        <p class="emr-login-subtitle">Sign in to your account to manage patient records, appointments, and doctors.</p>
+  <div class="emr-login-split">
+
+    <!-- Left Panel: Illustration -->
+    <div class="emr-login-left">
+      <div class="emr-login-left__content">
+        <div class="emr-login-brand">
+          <div class="emr-login-brand__icon">
+            <mat-icon>local_hospital</mat-icon>
+          </div>
+          <h1 class="emr-login-brand__title">EMR Portal</h1>
+        </div>
+        <p class="emr-login-brand__tagline">Smart Clinical Records &amp; Patient Management System</p>
+
+        <div class="emr-login-illustration-stage">
+          <img src="assets/images/Doctor-bro.svg" alt="Doctor Illustration" class="emr-login-illustration" />
+        </div>
+
+        <div class="emr-login-trust-strip">
+          <div class="emr-trust-item">
+            <mat-icon>verified_user</mat-icon>
+            <span>HIPAA Compliant</span>
+          </div>
+          <div class="emr-trust-item">
+            <mat-icon>lock</mat-icon>
+            <span>Secure Login</span>
+          </div>
+          <div class="emr-trust-item">
+            <mat-icon>support_agent</mat-icon>
+            <span>24/7 Support</span>
+          </div>
+        </div>
       </div>
-
-      <!-- Login Form -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="emr-login-form">
-
-        <!-- Email Field -->
-        <div class="emr-form-group mb-3">
-          <label class="emr-form-label">Email Address</label>
-          <div class="emr-input-wrapper">
-            <mat-icon class="emr-input-icon">mail</mat-icon>
-            <input
-              type="email"
-              class="emr-input w-100 emr-input--with-icon"
-              formControlName="email"
-              placeholder="e.g. admin@hospital.com"
-              [class.is-invalid]="email?.invalid && email?.touched" />
-          </div>
-          <div class="emr-error" *ngIf="email?.errors?.['required'] && email?.touched">
-            Email address is required
-          </div>
-          <div class="emr-error" *ngIf="email?.errors?.['email'] && email?.touched">
-            Please enter a valid email address
-          </div>
-        </div>
-
-        <!-- Password Field -->
-        <div class="emr-form-group mb-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <label class="emr-form-label">Password</label>
-          </div>
-          <div class="emr-input-wrapper">
-            <mat-icon class="emr-input-icon">lock</mat-icon>
-            <input
-              type="password"
-              class="emr-input w-100 emr-input--with-icon"
-              formControlName="password"
-              placeholder="Enter your password"
-              [class.is-invalid]="password?.invalid && password?.touched" />
-          </div>
-          <div class="emr-error" *ngIf="password?.errors?.['required'] && password?.touched">
-            Password is required
-          </div>
-          <div class="emr-error" *ngIf="password?.errors?.['minlength'] && password?.touched">
-            Password must be at least 6 characters
-          </div>
-        </div>
-
-        <!-- Error Banner -->
-        <div class="emr-login-alert mb-4" *ngIf="errorMsg()">
-          <mat-icon>error_outline</mat-icon>
-          <span>{{ errorMsg() }}</span>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="emr-button w-100 justify-content-center" [disabled]="loading()" style="height: 52px; font-size: 1rem; border-radius: 10px;">
-          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
-          <mat-icon *ngIf="!loading()">login</mat-icon>
-          <span>{{ loading() ? 'Signing In...' : 'Sign In to Portal' }}</span>
-        </button>
-
-      </form>
     </div>
+
+    <!-- Right Panel: Login Form -->
+    <div class="emr-login-right">
+      <div class="emr-login-form-wrapper">
+
+        <div class="emr-login-header">
+          <h2 class="emr-login-title">Welcome Back!</h2>
+          <p class="emr-login-subtitle">Please sign in to your account</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="emr-login-form">
+
+          <!-- Email Field -->
+          <div class="emr-form-group">
+            <label class="emr-form-label">Email Address</label>
+            <div class="emr-input-wrapper">
+              <mat-icon class="emr-input-icon">mail</mat-icon>
+              <input
+                type="email"
+                class="emr-input w-100 emr-input--with-icon"
+                formControlName="email"
+                placeholder="e.g. admin@hospital.com"
+                [class.is-invalid]="email?.invalid && email?.touched" />
+            </div>
+            <div class="emr-error" *ngIf="email?.errors?.['required'] && email?.touched">
+              Email address is required
+            </div>
+            <div class="emr-error" *ngIf="email?.errors?.['email'] && email?.touched">
+              Please enter a valid email address
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="emr-form-group">
+            <label class="emr-form-label">Password</label>
+            <div class="emr-input-wrapper">
+              <mat-icon class="emr-input-icon">lock</mat-icon>
+              <input
+                type="password"
+                class="emr-input w-100 emr-input--with-icon"
+                formControlName="password"
+                placeholder="Enter your password"
+                [class.is-invalid]="password?.invalid && password?.touched" />
+            </div>
+            <div class="emr-error" *ngIf="password?.errors?.['required'] && password?.touched">
+              Password is required
+            </div>
+            <div class="emr-error" *ngIf="password?.errors?.['minlength'] && password?.touched">
+              Password must be at least 6 characters
+            </div>
+          </div>
+
+          <!-- Error Banner -->
+          <div class="emr-login-alert" *ngIf="errorMsg()">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMsg() }}</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="emr-login-btn" [disabled]="loading()">
+            <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+            <mat-icon *ngIf="!loading()">login</mat-icon>
+            <span>{{ loading() ? 'Signing In...' : 'Sign In' }}</span>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
   </div>
+
 </div>

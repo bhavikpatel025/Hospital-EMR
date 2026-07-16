@@ -1,62 +1,192 @@
+// ─── Login Split Layout ────────────────────────────────────────
 .emr-login-page {
   min-height: 100vh;
   width: 100%;
-  display: grid;
-  place-items: center;
-  background: #f4f6f9;
+  display: flex;
+  background: #f0f4f8;
+}
+
+.emr-login-split {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+// ─── Left Panel (Illustration) ─────────────────────────────────
+.emr-login-left {
+  flex: 1.15;
+  background: linear-gradient(145deg, #e8f4f8 0%, #d4eef6 40%, #c5e8f2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
   position: relative;
   overflow: hidden;
-  padding: 24px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    width: 380px;
+    height: 380px;
+    background: rgba(70, 176, 202, 0.14);
+    border-radius: 50%;
+    filter: blur(70px);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 340px;
+    height: 340px;
+    background: rgba(17, 157, 164, 0.12);
+    border-radius: 50%;
+    filter: blur(60px);
+  }
 }
 
-.emr-login-glow {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(100px);
-  z-index: 0;
-  pointer-events: none;
+.emr-login-left__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 620px;
 }
 
-.emr-login-glow--1 {
-  width: 450px;
-  height: 450px;
-  top: -100px;
-  left: -100px;
-  background: rgba(17, 157, 164, 0.18);
+.emr-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-.emr-login-glow--2 {
-  width: 500px;
-  height: 500px;
-  bottom: -150px;
-  right: -100px;
-  background: rgba(24, 119, 201, 0.14);
+.emr-login-brand__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #119da4, #0c7b82);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 14px rgba(17, 157, 164, 0.35);
+
+  mat-icon {
+    color: #fff;
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
 }
 
-.emr-login-container {
+.emr-login-brand__title {
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f3960;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.emr-login-brand__tagline {
+  font-size: 0.95rem;
+  color: #4a6d8c;
+  margin: 0 0 28px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+// ─── Illustration Stage (glow behind image, hero-style) ────────
+.emr-login-illustration-stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    max-width: 78%;
+    aspect-ratio: 1 / 1;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+}
+
+.emr-login-illustration {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 460px;
+  max-width: 520px;
+  height: auto;
+  animation: floatIllustration 4s ease-in-out infinite;
+  filter: drop-shadow(0 12px 28px rgba(15, 57, 96, 0.12));
 }
 
-.emr-login-card {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(24px);
-  border-radius: 16px;
-  padding: 40px 36px;
-  box-shadow: 0 24px 60px rgba(18, 38, 63, 0.1);
-  border: 1px solid rgba(18, 38, 63, 0.08);
+@keyframes floatIllustration {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+// ─── Trust Strip (feature highlights, enterprise product feel) ─
+.emr-login-trust-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 1px solid rgba(15, 57, 96, 0.1);
+  width: 100%;
+}
+
+.emr-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f3960;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #119da4;
+  }
+}
+
+// ─── Right Panel (Login Form) ──────────────────────────────────
+.emr-login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background: #ffffff;
+}
+
+.emr-login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
 }
 
 .emr-login-header {
-  text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .emr-login-title {
-  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
-  font-size: 1.6rem;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #0f3960;
   margin: 0 0 8px;
@@ -64,16 +194,23 @@
 }
 
 .emr-login-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: #5e7389;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.5;
+}
+
+// ─── Form Elements ─────────────────────────────────────────────
+.emr-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .emr-form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .emr-form-label {
@@ -92,11 +229,12 @@
 .emr-input-icon {
   position: absolute;
   left: 14px;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 20px;
   width: 20px;
   height: 20px;
   pointer-events: none;
+  transition: color 0.2s ease;
 }
 
 .emr-input--with-icon {
@@ -105,40 +243,57 @@
 
 .emr-input {
   height: 50px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
   padding: 0 16px;
-  background: #ffffff;
+  background: #f8fafc;
   color: #1e293b;
   font-size: 0.95rem;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    border-color: #119da4;
+    background: #fff;
+    box-shadow: 0 0 0 3.5px rgba(17, 157, 164, 0.12);
+
+    & ~ .emr-input-icon,
+    + .emr-input-icon {
+      color: #119da4;
+    }
+  }
+
+  &.is-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
 }
 
-.emr-input:focus {
-  border-color: #119da4;
-  box-shadow: 0 0 0 3px rgba(17, 157, 164, 0.15);
-}
-
-.emr-input.is-invalid {
-  border-color: #ef4444;
+// Focus icon color fix (sibling)
+.emr-input-wrapper:focus-within .emr-input-icon {
+  color: #119da4;
 }
 
 .emr-error {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #ef4444;
   font-weight: 500;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
+// ─── Error Alert ───────────────────────────────────────────────
 .emr-login-alert {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #ffecec;
-  border: 1px solid #f87171;
-  color: #c44646;
-  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  border-radius: 10px;
   padding: 12px 16px;
   font-size: 0.88rem;
   font-weight: 600;
@@ -148,5 +303,104 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+  }
+}
+
+// ─── Submit Button ─────────────────────────────────────────────
+.emr-login-btn {
+  height: 52px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #119da4 0%, #0c7b82 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(17, 157, 164, 0.3);
+  margin-top: 4px;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0e8a91 0%, #0a6b72 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(17, 157, 164, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ─── Responsive ────────────────────────────────────────────────
+@media (max-width: 900px) {
+  .emr-login-split {
+    flex-direction: column;
+  }
+
+  .emr-login-left {
+    padding: 32px 24px 24px;
+    min-height: auto;
+  }
+
+  .emr-login-illustration-stage {
+    margin-bottom: 20px;
+  }
+
+  .emr-login-illustration {
+    max-width: 300px;
+  }
+
+  .emr-login-brand__tagline {
+    margin-bottom: 20px;
+  }
+
+  .emr-login-trust-strip {
+    gap: 18px;
+    padding-top: 16px;
+  }
+
+  .emr-login-right {
+    padding: 32px 24px 48px;
+  }
+}
+
+@media (max-width: 500px) {
+  .emr-login-left {
+    padding: 24px 16px 16px;
+  }
+
+  .emr-login-illustration {
+    max-width: 220px;
+  }
+
+  .emr-login-trust-strip {
+    gap: 12px;
+  }
+
+  .emr-trust-item {
+    font-size: 0.74rem;
+  }
+
+  .emr-login-right {
+    padding: 24px 16px 40px;
+  }
+
+  .emr-login-title {
+    font-size: 1.4rem;
   }
 }
