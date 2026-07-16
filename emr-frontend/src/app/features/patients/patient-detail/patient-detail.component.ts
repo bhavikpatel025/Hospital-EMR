@@ -60,8 +60,8 @@ export class PatientDetailComponent implements OnInit {
   protected readonly activeTab = signal<string | number>('records');
   protected readonly selectedDocCategory = signal<'Prescription' | 'LabReport' | 'Radiology'>('Prescription');
   protected readonly docCategories = [
-    { label: 'Prescription', value: 'Prescription', icon: 'pi pi-prescription' },
-    // { label: 'Lab Report', value: 'LabReport', icon: 'pi pi-chart-bar' },
+    { label: 'Prescription', value: 'Prescription', icon: 'pi pi-file-edit' },
+    { label: 'Lab Report', value: 'LabReport', icon: 'pi pi-chart-bar' },
     { label: 'Radiology / Scan', value: 'Radiology', icon: 'pi pi-camera' }
   ];
   protected readonly isExtracting = signal(false);
