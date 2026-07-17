@@ -192,6 +192,10 @@ public class DocumentsController : ControllerBase
 
         // Dynamically synthesize a real, highly accurate Executive Overview from actual DB records
         string executiveOverview;
+        string? prescriptionSummary = null;
+        string? labReportSummary = null;
+        string? radiologySummary = null;
+
         int totalRecords = documents.Count + medications.Count + labFindings.Count + radiologyNotes.Count;
 
         if (totalRecords == 0)
@@ -247,6 +251,65 @@ public class DocumentsController : ControllerBase
                                 $"Task: Write a concise, 100% accurate, professional 3-sentence Executive Clinical Snapshot for the attending physician summarizing this patient's primary medical profile, current medication regimen, and notable lab/scan findings based strictly on the above records.";
 
             executiveOverview = await GenerateClinicalSummaryWithGroqAsync(groqPrompt, fallbackText: executiveOverview);
+
+            // ⚡ Category-Wise Summaries Synthesis
+            var rxDocs = documents.Where(d => d.Category.Equals("Prescription", StringComparison.OrdinalIgnoreCase)).ToList();
+            var labDocs = documents.Where(d => d.Category.Equals("LabReport", StringComparison.OrdinalIgnoreCase)).ToList();
+            var radDocs = documents.Where(d => d.Category.Equals("Radiology", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (medications.Any() || rxDocs.Any())
+            {
+                var medNames = medications.Select(m => $"{m.MedicineName} {m.Dosage}".Trim()).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().ToList();
+                string rxSummaryText = medNames.Any()
+                    ? $"Patient is maintained on {medNames.Count} active medication(s) across {rxDocs.Count} uploaded prescription(s) (including {string.Join(", ", medNames.Take(4))})."
+                    : $"Analyzed {rxDocs.Count} prescription document(s).";
+
+                if (medNames.Any())
+                {
+                    string prompt = $"Active Medications: {string.Join(", ", medications.Take(12).Select(m => $"{m.MedicineName} {m.Dosage} ({m.Frequency})"))}\nUploaded Prescription Notes: {string.Join(" | ", rxDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Prescription Summary for the attending physician summarizing the patient's current active medication regimen.";
+                    prescriptionSummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: rxSummaryText);
+                }
+                else
+                {
+                    prescriptionSummary = rxSummaryText;
+                }
+            }
+
+            if (labFindings.Any() || labDocs.Any())
+            {
+                var abnormalLabs = labFindings.Where(l => l.IsAbnormal || l.Status.Contains("High", StringComparison.OrdinalIgnoreCase) || l.Status.Contains("Low", StringComparison.OrdinalIgnoreCase)).ToList();
+                string labSummaryText = abnormalLabs.Any()
+                    ? $"Recent blood panel highlights {abnormalLabs.Count} critical/abnormal marker(s) ({string.Join(", ", abnormalLabs.Take(3).Select(l => $"{l.TestName}: {l.ObservedValue} {l.Unit}"))}) across {labDocs.Count} report(s)."
+                    : $"{labFindings.Count} lab parameter(s) monitored across {labDocs.Count} report(s) within normal limits.";
+
+                if (labFindings.Any())
+                {
+                    string prompt = $"Lab Markers: {string.Join(", ", labFindings.Take(15).Select(l => $"{l.TestName}: {l.ObservedValue} {l.Unit} ({l.Status})"))}\nUploaded Lab Report Notes: {string.Join(" | ", labDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Lab Report Summary for the attending physician highlighting any abnormal glucose, renal, or hematological parameters.";
+                    labReportSummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: labSummaryText);
+                }
+                else
+                {
+                    labReportSummary = labSummaryText;
+                }
+            }
+
+            if (radiologyNotes.Any() || radDocs.Any())
+            {
+                var latestRad = radiologyNotes.FirstOrDefault();
+                string radSummaryText = latestRad != null
+                    ? $"Latest Scan/Imaging impression: \"{latestRad.ImpressionText}\""
+                    : $"Analyzed {radDocs.Count} radiology/scan report(s).";
+
+                if (radiologyNotes.Any())
+                {
+                    string prompt = $"Radiology & Scan Findings: {string.Join(" | ", radiologyNotes.Take(5).Select(r => r.ImpressionText))}\nUploaded Scan Notes: {string.Join(" | ", radDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Radiology / Scan Summary for the attending physician summarizing the imaging impressions without speculation.";
+                    radiologySummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: radSummaryText);
+                }
+                else
+                {
+                    radiologySummary = radSummaryText;
+                }
+            }
         }
 
         DateTime? lastUpdated = null;
@@ -274,6 +337,9 @@ public class DocumentsController : ControllerBase
             totalDocumentsScanned = documents.Count,
             lastUpdated = lastUpdated ?? DateTime.UtcNow,
             executiveOverview,
+            prescriptionSummary,
+            labReportSummary,
+            radiologySummary,
             activeMedications = medications.Take(15).ToList(),
             radiologyHighlights = radiologyNotes.Take(10).ToList(),
             labHighlights = labFindings.Take(20).ToList(),
