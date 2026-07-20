@@ -1,0 +1,26 @@
+<div class="voice-dictation-container d-flex align-items-center gap-2">
+  <ng-container *ngIf="!voiceService.isTranscribing()">
+    <p-button 
+      [icon]="voiceService.isRecording() ? 'pi pi-stop-circle' : 'pi pi-microphone'" 
+      [label]="voiceService.isRecording() ? 'Stop & Transcribe' : 'Start Dictation'" 
+      [severity]="voiceService.isRecording() ? 'danger' : 'secondary'"
+      [variant]="voiceService.isRecording() ? undefined : 'outlined'"
+      [styleClass]="voiceService.isRecording() ? 'p-button-rounded pulse-animation px-3' : 'p-button-rounded px-3'"
+      (onClick)="toggleRecording()">
+    </p-button>
+    <span *ngIf="voiceService.isRecording()" class="text-danger small fw-bold ms-2 blink-text">
+      ● Recording...
+    </span>
+  </ng-container>
+
+  <ng-container *ngIf="voiceService.isTranscribing()">
+    <p-button 
+      icon="pi pi-spin pi-spinner" 
+      label="AI Transcribing..." 
+      severity="info"
+      variant="text"
+      [disabled]="true"
+      styleClass="p-button-rounded px-3">
+    </p-button>
+  </ng-container>
+</div>

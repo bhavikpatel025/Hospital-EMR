@@ -94,7 +94,7 @@
         <h5 class="mb-0 text-white fw-bold fs-6">Patient Clinical Summary & Overview</h5>
         <p-tag severity="warn" [value]="'Auto-Synthesized (' + summary.totalDocumentsScanned + ' Docs)'" styleClass="ms-2 px-2 py-0.5 text-xs font-bold rounded-pill bg-white text-dark"></p-tag>
       </div>
-      <span class="text-white-50 text-xs font-medium">Last Updated: {{ summary.lastUpdated + 'Z' | date:'dd MMM yyyy, hh:mm a' }}</span>
+      <span class="text-white-50 text-xs font-medium">Last Updated: {{ (summary.lastUpdated.endsWith('Z') ? summary.lastUpdated : summary.lastUpdated + 'Z') | date:'dd MMM yyyy, hh:mm a' }}</span>
     </div>
 
     <div class="p-4 bg-white">
@@ -153,6 +153,35 @@
           </div>
         </div>
       </div>
+    </div>
+  </p-card>
+
+  <!-- 🎙️ AI Voice Clinical Notes Dictation -->
+  <p-card styleClass="emr-voice-dictation rounded-4 mb-4 border-0 shadow-sm">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+      <div>
+        <h5 class="fw-bold text-dark d-flex align-items-center gap-2 mb-1 fs-6">
+          <div class="d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 32px; height: 32px;">
+            <i class="pi pi-microphone fs-6"></i>
+          </div>
+          AI Clinical Voice Notes (Groq Whisper)
+        </h5>
+        <p class="text-muted mb-0 small ms-5">
+          Dictate consultation notes, symptoms, and prescriptions. AI will instantly transcribe it with high medical accuracy.
+        </p>
+      </div>
+      <app-voice-dictation (textTranscribed)="dictatedNote.set(dictatedNote() ? dictatedNote() + '\n' + $event : $event)"></app-voice-dictation>
+    </div>
+    
+    <div class="mt-3 bg-light rounded-3 border">
+      <textarea 
+        pInputTextarea 
+        [ngModel]="dictatedNote()" 
+        (ngModelChange)="dictatedNote.set($event)"
+        rows="4" 
+        class="w-100 border-0 p-3 bg-transparent font-medium" 
+        style="resize: none; outline: none; box-shadow: none;"
+        placeholder="Start speaking... Transcribed notes will appear here. You can also type or edit manually..."></textarea>
     </div>
   </p-card>
 

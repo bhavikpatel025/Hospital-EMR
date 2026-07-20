@@ -30,6 +30,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
+import { VoiceDictationComponent } from '../../../shared/components/voice-dictation/voice-dictation.component';
 
 @Component({
   selector: 'app-patient-detail',
@@ -38,7 +39,7 @@ import { TooltipModule } from 'primeng/tooltip';
     CommonModule, RouterLink, MatIconModule, MatDialogModule, FormsModule,
     CardModule, TableModule, TabsModule, DialogModule, ButtonModule,
     TagModule, ProgressSpinnerModule, SelectButtonModule, InputTextModule,
-    TextareaModule, TooltipModule
+    TextareaModule, TooltipModule, VoiceDictationComponent
   ],
   templateUrl: './patient-detail.component.html',
   styleUrl: './patient-detail.component.scss'
@@ -58,6 +59,10 @@ export class PatientDetailComponent implements OnInit {
 
   // Smart Document OCR & Auto-Entry state
   protected readonly activeTab = signal<string | number>('records');
+  
+  // Voice Dictation state
+  protected readonly dictatedNote = signal<string>('');
+
   protected readonly selectedDocCategory = signal<'Prescription' | 'LabReport' | 'Radiology'>('Prescription');
   protected readonly docCategories = [
     { label: 'Prescription', value: 'Prescription', icon: 'pi pi-file-edit' },
