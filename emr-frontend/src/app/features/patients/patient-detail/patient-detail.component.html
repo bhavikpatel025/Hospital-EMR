@@ -70,7 +70,7 @@
         <h5 class="mb-0 text-white fw-bold fs-6">Patient Clinical Summary & Overview</h5>
         <p-tag severity="warn" [value]="'Auto-Synthesized (' + summary.totalDocumentsScanned + ' Docs)'" styleClass="ms-2 px-2 py-0.5 text-xs font-bold rounded-pill bg-white text-dark"></p-tag>
       </div>
-      <span class="text-white-50 text-xs font-medium">Last Updated: {{ summary.lastUpdated | date:'dd MMM yyyy, hh:mm a' }}</span>
+      <span class="text-white-50 text-xs font-medium">Last Updated: {{ summary.lastUpdated + 'Z' | date:'dd MMM yyyy, hh:mm a' }}</span>
     </div>
 
     <div class="p-4 bg-white">
