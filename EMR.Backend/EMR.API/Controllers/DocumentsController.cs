@@ -266,7 +266,7 @@ public class DocumentsController : ControllerBase
 
                 if (medNames.Any())
                 {
-                    string prompt = $"Active Medications: {string.Join(", ", medications.Take(12).Select(m => $"{m.MedicineName} {m.Dosage} ({m.Frequency})"))}\nUploaded Prescription Notes: {string.Join(" | ", rxDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Prescription Summary for the attending physician summarizing the patient's current active medication regimen.";
+                    string prompt = $"Active Medications: {string.Join(", ", medications.Take(15).Select(m => $"{m.MedicineName} {m.Dosage} ({m.Frequency})"))}\nUploaded Prescription Notes: {string.Join(" | ", rxDocs.Take(5).Select(d => d.RawTextSummary))}\n\nTask: Write a structured, professional Prescription Summary formatted strictly as single-line bullet points (each line starting with '• '). Adaptive length rule: If standard (under 6 medications), write 3 to 4 bullet points. If extensive (6+ medications), write between 5 to 7 bullet points by grouping related medications logically so it never exceeds 7 items and remains easy to read.";
                     prescriptionSummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: rxSummaryText);
                 }
                 else
@@ -284,7 +284,7 @@ public class DocumentsController : ControllerBase
 
                 if (labFindings.Any())
                 {
-                    string prompt = $"Lab Markers: {string.Join(", ", labFindings.Take(15).Select(l => $"{l.TestName}: {l.ObservedValue} {l.Unit} ({l.Status})"))}\nUploaded Lab Report Notes: {string.Join(" | ", labDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Lab Report Summary for the attending physician highlighting any abnormal glucose, renal, or hematological parameters.";
+                    string prompt = $"Lab Markers: {string.Join(", ", labFindings.Take(20).Select(l => $"{l.TestName}: {l.ObservedValue} {l.Unit} ({l.Status})"))}\nUploaded Lab Report Notes: {string.Join(" | ", labDocs.Take(5).Select(d => d.RawTextSummary))}\n\nTask: Write a structured, professional Lab Report Summary formatted strictly as single-line bullet points (each line starting with '• '). Adaptive length rule: If normal or minor findings, write 3 to 4 bullet points. If multiple abnormal markers across reports, write between 5 to 7 bullet points highlighting the most critical parameters (never exceeding 7 items).";
                     labReportSummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: labSummaryText);
                 }
                 else
@@ -302,7 +302,7 @@ public class DocumentsController : ControllerBase
 
                 if (radiologyNotes.Any())
                 {
-                    string prompt = $"Radiology & Scan Findings: {string.Join(" | ", radiologyNotes.Take(5).Select(r => r.ImpressionText))}\nUploaded Scan Notes: {string.Join(" | ", radDocs.Take(3).Select(d => d.RawTextSummary))}\n\nTask: Write a concise, professional 2-sentence Radiology / Scan Summary for the attending physician summarizing the imaging impressions without speculation.";
+                    string prompt = $"Radiology & Scan Findings: {string.Join(" | ", radiologyNotes.Take(8).Select(r => r.ImpressionText))}\nUploaded Scan Notes: {string.Join(" | ", radDocs.Take(5).Select(d => d.RawTextSummary))}\n\nTask: Write a structured, professional Radiology / Scan Summary formatted strictly as single-line bullet points (each line starting with '• '). Adaptive length rule: For standard scans, write 3 to 4 bullet points. If multiple complex scans are uploaded, write between 5 to 7 bullet points summarizing key impressions clearly without speculation (never exceeding 7 items).";
                     radiologySummary = await GenerateClinicalSummaryWithGroqAsync(prompt, fallbackText: radSummaryText);
                 }
                 else

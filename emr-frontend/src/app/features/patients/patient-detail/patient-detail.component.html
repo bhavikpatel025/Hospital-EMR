@@ -85,26 +85,38 @@
 
           <!-- 1. Prescription Summary Section -->
           <div *ngIf="summary.prescriptionSummary" class="p-3 mb-2 rounded-3 border-start border-4 border-success bg-white shadow-2xs">
-            <h6 class="fw-bold text-success d-flex align-items-center gap-2 mb-1 fs-7">
+            <h6 class="fw-bold text-success d-flex align-items-center gap-2 mb-2 fs-7">
               <i class="pi pi-file-edit"></i> Prescription Summary:
             </h6>
-            <p class="mb-0 text-dark small font-medium" style="line-height: 1.5;">{{ summary.prescriptionSummary }}</p>
+            <ul class="mb-0 ps-3 text-dark small font-medium" style="line-height: 1.65; list-style-type: disc;">
+              <li *ngFor="let bullet of formatBullets(summary.prescriptionSummary)" class="mb-1">
+                {{ bullet }}
+              </li>
+            </ul>
           </div>
 
           <!-- 2. Lab Report Summary Section -->
           <div *ngIf="summary.labReportSummary" class="p-3 mb-2 rounded-3 border-start border-4 border-primary bg-white shadow-2xs">
-            <h6 class="fw-bold text-primary d-flex align-items-center gap-2 mb-1 fs-7">
+            <h6 class="fw-bold text-primary d-flex align-items-center gap-2 mb-2 fs-7">
               <i class="pi pi-chart-bar"></i> Lab Report Summary:
             </h6>
-            <p class="mb-0 text-dark small font-medium" style="line-height: 1.5;">{{ summary.labReportSummary }}</p>
+            <ul class="mb-0 ps-3 text-dark small font-medium" style="line-height: 1.65; list-style-type: disc;">
+              <li *ngFor="let bullet of formatBullets(summary.labReportSummary)" class="mb-1">
+                {{ bullet }}
+              </li>
+            </ul>
           </div>
 
           <!-- 3. Radiology / Scan Summary Section -->
           <div *ngIf="summary.radiologySummary" class="p-3 mb-0 rounded-3 border-start border-4 border-info bg-white shadow-2xs" style="border-left-color: #8b5cf6 !important;">
-            <h6 class="fw-bold d-flex align-items-center gap-2 mb-1 fs-7" style="color: #6d28d9;">
+            <h6 class="fw-bold d-flex align-items-center gap-2 mb-2 fs-7" style="color: #6d28d9;">
               <i class="pi pi-camera"></i> Radiology / Scan Summary:
             </h6>
-            <p class="mb-0 text-dark small font-medium" style="line-height: 1.5;">{{ summary.radiologySummary }}</p>
+            <ul class="mb-0 ps-3 text-dark small font-medium" style="line-height: 1.65; list-style-type: disc;">
+              <li *ngFor="let bullet of formatBullets(summary.radiologySummary)" class="mb-1">
+                {{ bullet }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>

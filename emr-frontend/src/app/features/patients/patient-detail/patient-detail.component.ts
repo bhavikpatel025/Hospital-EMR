@@ -90,6 +90,82 @@ export class PatientDetailComponent implements OnInit {
       .join('');
   });
 
+  formatBullets(text?: string): string[] {
+    if (!text || !text.trim()) return [];
+
+    const cleaned = text.trim();
+
+    // 1. If it already explicitly uses bullet symbols (`•`, `-`, `*`), split exactly by those items
+    if (cleaned.includes('•') || cleaned.includes('\n- ') || cleaned.includes('\n* ')) {
+      return cleaned
+        .split(/(?:\r?\n|•|\n- |\n\* )/)
+        .map(line => line.replace(/^[\s\-*•]+/, '').trim())
+        .filter(line => line.length > 3);
+    }
+
+    // 2. If it has newlines, split by newlines
+    if (cleaned.includes('\n')) {
+      const lines = cleaned
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 3);
+      if (lines.length > 1) return lines;
+    }
+
+    // 3. Split paragraph sentences by period or semicolon
+    let sentenceSplit = cleaned
+      .split(/(?<=[a-zA-Z]{3,}|\]|\))[.;]\s+(?=[A-Z0-9])/i)
+      .map(s => s.trim().replace(/[.]+$/, ''))
+      .filter(s => s.length > 5);
+
+    // 4. If any sentence itself is long and has comma-separated items or 'including' (e.g. 6 medications list)
+    const refinedBullets: string[] = [];
+    for (const item of (sentenceSplit.length > 0 ? sentenceSplit : [cleaned])) {
+      if (item.length > 120 && (item.includes(', including ') || item.includes(': ') || (item.match(/,/g) || []).length >= 3)) {
+        let parts: string[] = [];
+        if (item.includes(', including ')) {
+          const splitInc = item.split(', including ');
+          refinedBullets.push(splitInc[0] + ' (Key Regimen/List):');
+          parts = splitInc[1].split(/,\s*(?:and\s+)?/i);
+        } else if (item.includes(': ')) {
+          const splitCol = item.split(': ');
+          refinedBullets.push(splitCol[0] + ':');
+          parts = splitCol[1].split(/,\s*(?:and\s+)?/i);
+        } else {
+          parts = item.split(/,\s*(?:and\s+)?/i);
+        }
+        for (const p of parts) {
+          const trimmedP = p.trim().replace(/[.]+$/, '');
+          if (trimmedP.length > 4) {
+            refinedBullets.push(trimmedP);
+          }
+        }
+      } else {
+        refinedBullets.push(item);
+      }
+    }
+
+    let result = refinedBullets.length > 0 ? refinedBullets : [cleaned];
+
+    // Adaptive Goldilocks rule: If normal, keep 3 to 4. If complex/many, group and cap neatly between 5 to 7 points
+    // so it never looks like an overly long, cluttered list on the screen!
+    while (result.length > 7) {
+      let minLen = 999999;
+      let minIdx = result.length > 1 ? 1 : 0;
+      for (let i = (result.length > 2 ? 1 : 0); i < result.length - 1; i++) {
+        const combinedLen = result[i].length + result[i + 1].length;
+        if (combinedLen < minLen) {
+          minLen = combinedLen;
+          minIdx = i;
+        }
+      }
+      result[minIdx] = `${result[minIdx]}; ${result[minIdx + 1]}`;
+      result.splice(minIdx + 1, 1);
+    }
+
+    return result;
+  }
+
   ngOnInit(): void {
     const patientId = Number(this.route.snapshot.paramMap.get('id'));
     if (!patientId) {
