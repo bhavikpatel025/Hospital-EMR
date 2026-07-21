@@ -1,5 +1,5 @@
 <div class="voice-dictation-container d-flex align-items-center gap-2">
-  <ng-container *ngIf="!voiceService.isTranscribing()">
+  <ng-container *ngIf="!voiceService.isTranscribing() && !isExtracting()">
     <p-button 
       [icon]="voiceService.isRecording() ? 'pi pi-stop-circle' : 'pi pi-microphone'" 
       [label]="voiceService.isRecording() ? 'Stop & Transcribe' : 'Start Dictation'" 
@@ -18,6 +18,17 @@
       icon="pi pi-spin pi-spinner" 
       label="AI Transcribing..." 
       severity="info"
+      variant="text"
+      [disabled]="true"
+      styleClass="p-button-rounded px-3">
+    </p-button>
+  </ng-container>
+
+  <ng-container *ngIf="isExtracting()">
+    <p-button 
+      icon="pi pi-spin pi-spinner" 
+      label="AI Extracting Data..." 
+      severity="help"
       variant="text"
       [disabled]="true"
       styleClass="p-button-rounded px-3">

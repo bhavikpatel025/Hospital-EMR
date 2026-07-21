@@ -1,7 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
+import { ExtractedMedicalDataDto } from '../models/patient.model';
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +78,11 @@ export class VoiceService {
       this.http.post<{text: string}>(`${environment.apiUrl}/Voice/transcribe`, formData)
     );
     
+    
     return response.text;
+  }
+
+  extractVoiceData(text: string): Observable<ExtractedMedicalDataDto> {
+    return this.http.post<ExtractedMedicalDataDto>(`${environment.apiUrl}/Voice/extract`, { text });
   }
 }

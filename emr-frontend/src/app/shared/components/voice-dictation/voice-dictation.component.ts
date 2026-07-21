@@ -1,8 +1,10 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { VoiceService } from '../../../core/services/voice.service';
 import { MessageService } from 'primeng/api';
+import { ExtractedMedicalDataDto } from '../../../core/models/patient.model';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-voice-dictation',
@@ -15,7 +17,10 @@ export class VoiceDictationComponent {
   public voiceService = inject(VoiceService);
   private messageService = inject(MessageService);
 
+  public isExtracting = signal(false);
+
   @Output() textTranscribed = new EventEmitter<string>();
+  @Output() dataExtracted = new EventEmitter<ExtractedMedicalDataDto>();
 
   async toggleRecording() {
     if (this.voiceService.isRecording()) {
@@ -24,6 +29,21 @@ export class VoiceDictationComponent {
         if (text && text.trim().length > 0) {
           this.textTranscribed.emit(text);
           this.messageService.add({ severity: 'success', summary: 'Dictation Saved', detail: 'Audio transcribed successfully by Groq AI.' });
+          
+          // Now extract structured data automatically
+          this.isExtracting.set(true);
+          this.voiceService.extractVoiceData(text)
+            .pipe(finalize(() => this.isExtracting.set(false)))
+            .subscribe({
+              next: (data) => {
+                this.dataExtracted.emit(data);
+                this.messageService.add({ severity: 'success', summary: 'AI Extraction', detail: 'Medical data auto-filled successfully.' });
+              },
+              error: () => {
+                this.messageService.add({ severity: 'warn', summary: 'Extraction Failed', detail: 'Could not extract structured data.' });
+              }
+            });
+
         } else {
           this.messageService.add({ severity: 'warn', summary: 'No Audio', detail: 'No speech was detected.' });
         }

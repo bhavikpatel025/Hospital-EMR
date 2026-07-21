@@ -2,9 +2,11 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EMR.Application.Interfaces;
+using EMR.Application.DTOs.Documents;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -88,6 +90,100 @@ public class GroqWhisperService : IVoiceService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred during audio transcription.");
+            throw;
+        }
+    }
+
+    public async Task<AiExtractedDocumentDto> ExtractVoiceDataAsync(string rawText)
+    {
+        if (string.IsNullOrWhiteSpace(rawText))
+        {
+            return new AiExtractedDocumentDto();
+        }
+
+        string apiKey = _configuration["GroqSettings:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey) || apiKey == "YOUR_GROQ_API_KEY_HERE")
+        {
+            _logger.LogError("Groq API Key is not configured correctly.");
+            throw new InvalidOperationException("Groq API Key is missing. Extraction cannot proceed.");
+        }
+
+        try
+        {
+            using var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+            string endpoint = "https://api.groq.com/openai/v1/chat/completions";
+
+            var systemPrompt = @"You are a medical AI assistant. Extract clinical data from the following voice transcription into a structured JSON format. 
+DO NOT add any other conversational text. Output ONLY valid JSON matching this exact structure:
+{
+    ""clinicalSummary"": ""string (Brief summary of the visit)"",
+    ""diagnoses"": [""string""],
+    ""medications"": [
+        {
+            ""medicineName"": ""string"",
+            ""dosage"": ""string"",
+            ""frequency"": ""string"",
+            ""duration"": ""string""
+        }
+    ],
+    ""labFindings"": [
+        {
+            ""testName"": ""string"",
+            ""observedValue"": ""string"",
+            ""referenceRange"": ""string"",
+            ""isAbnormal"": boolean
+        }
+    ]
+}
+If any field is missing or not mentioned, return null or empty array.";
+
+            var requestBody = new
+            {
+                model = "llama-3.3-70b-versatile",
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = rawText }
+                },
+                temperature = 0.1,
+                response_format = new { type = "json_object" }
+            };
+
+            var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(endpoint, jsonContent);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Groq LLaMA API failed: {statusCode} {error}", response.StatusCode, responseString);
+                throw new Exception($"Extraction failed: {responseString}");
+            }
+
+            using var jsonDocument = JsonDocument.Parse(responseString);
+            var root = jsonDocument.RootElement;
+
+            if (root.TryGetProperty("choices", out var choicesElement) && choicesElement.GetArrayLength() > 0)
+            {
+                var contentString = choicesElement[0].GetProperty("message").GetProperty("content").GetString();
+                if (!string.IsNullOrWhiteSpace(contentString))
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var extracted = JsonSerializer.Deserialize<AiExtractedDocumentDto>(contentString, options);
+                    if (extracted != null)
+                    {
+                        return extracted;
+                    }
+                }
+            }
+
+            return new AiExtractedDocumentDto();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred during voice data extraction.");
             throw;
         }
     }

@@ -8,12 +8,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { ButtonModule } from 'primeng/button';
 
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { DoctorService } from '../../../core/services/doctor.service';
@@ -25,9 +24,9 @@ import { DoctorListDto } from '../../../core/models/doctor.model';
   selector: 'app-appointment-calendar',
   standalone: true,
   imports: [
-    CommonModule, FullCalendarModule, MatDialogModule, MatButtonModule,
-    MatIconModule, MatFormFieldModule, MatSelectModule, FormsModule
+    CommonModule, FullCalendarModule, FormsModule, DropdownModule, ButtonModule
   ],
+  providers: [DialogService],
   templateUrl: './appointment-calendar.component.html',
   styleUrl: './appointment-calendar.component.scss'
 })
@@ -37,10 +36,12 @@ export class AppointmentCalendarComponent implements OnInit {
   private appointmentService = inject(AppointmentService);
   private doctorService = inject(DoctorService);
   private notify = inject(NotificationService);
-  private dialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
+  private ref: DynamicDialogRef | undefined;
   private router = inject(Router);
 
   doctors: DoctorListDto[] = [];
+  doctorOptions: any[] = [];
   doctorFilter: number | null = null;
 
   calendarOptions: CalendarOptions = {
@@ -65,7 +66,13 @@ export class AppointmentCalendarComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.doctorService.getActiveDoctors().subscribe(res => this.doctors = res);
+    this.doctorService.getActiveDoctors().subscribe(res => {
+      this.doctors = res;
+      this.doctorOptions = [
+        { label: 'All Doctors', value: null },
+        ...res.map(d => ({ label: `Dr. ${d.fullName}`, value: d.doctorId }))
+      ];
+    });
   }
 
   onList(): void {
@@ -106,21 +113,29 @@ export class AppointmentCalendarComponent implements OnInit {
   }
 
   onDateSelect(arg: DateSelectArg): void {
-    const clickedDate = arg.startStr.split('T')[0];   // sirf date part (YYYY-MM-DD)
+    const clickedDate = arg.startStr.split('T')[0];
+    this.openQuickDialog(clickedDate);
+    arg.view.calendar.unselect();
+  }
 
-    const dialogRef = this.dialog.open(QuickAppointmentDialogComponent, {
+  private openQuickDialog(dateStr: string, existingAppointment?: any) {
+    this.ref = this.dialogService.open(QuickAppointmentDialogComponent, {
+      header: existingAppointment ? 'Edit Appointment' : 'New Appointment',
       width: '500px',
-      data: { date: clickedDate }
+      data: {
+        date: dateStr,
+        appointment: existingAppointment
+      },
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000
     });
 
-    dialogRef.afterClosed().subscribe(created => {
-      if (created) {
+    this.ref.onClose.subscribe(result => {
+      if (result === 'saved') {
         const api = this.calendarComponent.getApi();
         this.loadEvents(api.view.activeStart.toISOString(), api.view.activeEnd.toISOString());
       }
     });
-
-    arg.view.calendar.unselect();
   }
 
   onEventClick(arg: EventClickArg): void {

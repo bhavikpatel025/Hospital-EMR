@@ -83,6 +83,7 @@ export interface ExtractedMedicalDataDto {
   medications?: ExtractedMedicationItem[];
   labFindings?: ExtractedLabItem[];
   radiologyImpression?: string;
+  clinicalSummary?: string;
   rawTextSummary?: string;
   rawOcrText?: string;
 }

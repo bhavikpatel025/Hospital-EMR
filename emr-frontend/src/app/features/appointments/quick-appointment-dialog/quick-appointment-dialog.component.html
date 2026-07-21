@@ -68,12 +68,12 @@
       <label class="form-label fw-semibold mb-1 d-flex align-items-center gap-1">
         <i class="pi pi-user-plus text-primary"></i> Select Doctor <span class="text-danger">*</span>
       </label>
-      <select formControlName="doctorId" class="form-select emr-prime-select py-2">
-        <option [ngValue]="null" disabled selected>-- Choose Doctor --</option>
-        <option *ngFor="let d of doctors()" [value]="d.doctorId">
-          Dr. {{ d.fullName }} — {{ d.specialization || 'General Physician' }}
-        </option>
-      </select>
+      <p-dropdown 
+        [options]="doctorOptions()" 
+        formControlName="doctorId" 
+        placeholder="-- Choose Doctor --" 
+        styleClass="w-100 emr-prime-dropdown">
+      </p-dropdown>
     </div>
 
     <!-- 3. Time Slots (Start Time & End Time) -->

@@ -16,7 +16,9 @@ import { AppointmentService } from '../../../core/services/appointment.service';
 import { PatientService } from '../../../core/services/patient.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { VoiceService } from '../../../core/services/voice.service';
 import { environment } from '../../../../environments/environment';
+import { finalize } from 'rxjs';
 
 // PrimeNG v19/v21 Standalone Component Imports
 import { CardModule } from 'primeng/card';
@@ -52,6 +54,7 @@ export class PatientDetailComponent implements OnInit {
   private readonly notify = inject(NotificationService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly dialog = inject(MatDialog);
+  private readonly voiceService = inject(VoiceService);
 
   protected readonly patient = signal<PatientDetailDto | null>(null);
   protected readonly appointments = signal<AppointmentListDto[]>([]);
@@ -343,6 +346,54 @@ export class PatientDetailComponent implements OnInit {
   protected closeVerificationModal(): void {
     this.showVerificationModal.set(false);
     this.extractedData.set(null);
+  }
+
+  protected onVoiceDataExtracted(data: ExtractedMedicalDataDto): void {
+    if (data) {
+      // Auto-append the clinical summary to the voice dictation note
+      if (data.clinicalSummary) {
+        const prefix = this.dictatedNote() ? this.dictatedNote() + '\n\n--- AI Summary ---\n' : '--- AI Summary ---\n';
+        this.dictatedNote.set(prefix + data.clinicalSummary);
+      }
+
+      const hasMeds = (data.medications?.length ?? 0) > 0;
+      const hasLabs = (data.labFindings?.length ?? 0) > 0;
+      const hasRadiology = !!data.radiologyImpression;
+
+      // If there's structured data (Meds, Labs, Radiology), open the verification modal to save to DB
+      if (hasMeds || hasLabs || hasRadiology || data.diagnoses?.length) {
+        data.category = 'VoiceDictation';
+        data.documentTitle = 'Voice Consultation Extraction';
+        data.extractedDate = new Date().toISOString();
+        
+        this.extractedData.set(data);
+        this.showVerificationModal.set(true);
+
+        this.notify.success('Voice transcription processed by AI. Please review and confirm the extracted structured data.');
+      } else if (data.clinicalSummary) {
+        // Just clinical summary extracted, no structured entities
+        this.notify.success('AI Summary generated successfully.');
+      } else {
+        this.notify.info('Transcription successful, but no specific clinical data was detected by AI.');
+      }
+    }
+  }
+
+  protected extractManually(): void {
+    const text = this.dictatedNote();
+    if (!text || text.trim().length === 0) return;
+
+    this.isExtracting.set(true);
+    this.voiceService.extractVoiceData(text)
+      .pipe(finalize(() => this.isExtracting.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.onVoiceDataExtracted(data);
+        },
+        error: () => {
+          this.notify.error('Extraction Failed. Could not extract structured data.');
+        }
+      });
   }
 
   protected confirmAutoEntry(): void {

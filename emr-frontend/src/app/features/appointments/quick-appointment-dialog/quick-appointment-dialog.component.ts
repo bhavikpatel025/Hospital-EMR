@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
 
 import { AppointmentService } from '../../../core/services/appointment.service';
 import { PatientService } from '../../../core/services/patient.service';
@@ -17,7 +18,7 @@ import { DoctorListDto } from '../../../core/models/doctor.model';
   selector: 'app-quick-appointment-dialog',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule, ButtonModule, InputTextModule
+    CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, DropdownModule
   ],
   templateUrl: './quick-appointment-dialog.component.html',
   styleUrl: './quick-appointment-dialog.component.scss'
@@ -28,10 +29,12 @@ export class QuickAppointmentDialogComponent implements OnInit {
   private patientService = inject(PatientService);
   private doctorService = inject(DoctorService);
   private notify = inject(NotificationService);
-  dialogRef = inject(MatDialogRef<QuickAppointmentDialogComponent>);
-  data = inject(MAT_DIALOG_DATA);   // { date: string }
+  dialogRef = inject(DynamicDialogRef);
+  config = inject(DynamicDialogConfig);
+  data = this.config.data;   // { date: string, appointment?: any }
 
   doctors = signal<DoctorListDto[]>([]);
+  doctorOptions = computed(() => this.doctors().map(d => ({ label: `Dr. ${d.fullName} — ${d.specialization || 'General Physician'}`, value: d.doctorId })));
   patientResults = signal<PatientListDto[]>([]);
   saving = signal(false);
 
@@ -185,7 +188,7 @@ export class QuickAppointmentDialogComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.notify.success('Appointment created successfully');
-        this.dialogRef.close(true);
+        this.dialogRef.close('saved');
       },
       error: (err) => {
         this.saving.set(false);
@@ -195,6 +198,6 @@ export class QuickAppointmentDialogComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close();
   }
 }

@@ -170,18 +170,34 @@
           Dictate consultation notes, symptoms, and prescriptions. AI will instantly transcribe it with high medical accuracy.
         </p>
       </div>
-      <app-voice-dictation (textTranscribed)="dictatedNote.set(dictatedNote() ? dictatedNote() + '\n' + $event : $event)"></app-voice-dictation>
+      <app-voice-dictation 
+        (textTranscribed)="dictatedNote.set(dictatedNote() ? dictatedNote() + '\n' + $event : $event)"
+        (dataExtracted)="onVoiceDataExtracted($event)">
+      </app-voice-dictation>
     </div>
     
-    <div class="mt-3 bg-light rounded-3 border">
+    <div class="mt-3 bg-light rounded-3 border position-relative">
       <textarea 
         pInputTextarea 
         [ngModel]="dictatedNote()" 
         (ngModelChange)="dictatedNote.set($event)"
         rows="4" 
         class="w-100 border-0 p-3 bg-transparent font-medium" 
-        style="resize: none; outline: none; box-shadow: none;"
+        style="resize: none; outline: none; box-shadow: none; padding-bottom: 3.5rem !important;"
         placeholder="Start speaking... Transcribed notes will appear here. You can also type or edit manually..."></textarea>
+        
+      <!-- Manual Extraction Button -->
+      <div class="position-absolute bottom-0 end-0 p-2">
+        <p-button 
+          label="Extract Data with AI" 
+          icon="pi pi-sparkles" 
+          severity="help" 
+          size="small"
+          [disabled]="!dictatedNote() || isExtracting()"
+          [loading]="isExtracting()"
+          (onClick)="extractManually()">
+        </p-button>
+      </div>
     </div>
   </p-card>
 
