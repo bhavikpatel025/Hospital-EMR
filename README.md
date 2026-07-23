@@ -30,9 +30,47 @@ An advanced, highly responsive, and AI-augmented **Hospital Electronic Medical R
 * **Interactive OPD Appointments:** Doctor-Patient linked appointment booking with real-time status management (`Pending`, `Confirmed`, `Completed`, `Cancelled`).
 * **Live Clinical Dashboard:** Interactive summary cards and daily OPD queue overview.
 
+### 📊 4. Advanced Clinical Dashboard (New)
+* **Real-time Analytics:** Visual representation of hospital metrics using PrimeNG Charts (`Chart.js`).
+* **Appointments Trend:** A Line Chart showing the 30-day trend of OPD appointments.
+* **Patient Demographics:** A dynamic Donut Chart illustrating the gender distribution of registered patients.
+
+*(Add Dashboard Screenshot here)*
+![Dashboard Analytics](screenshots/dashboard.png)
+
+### 🦴 5. Interactive Joint Assessment (Rheumatology Module) (New)
+* **Visual Body Map:** A responsive, interactive SVG Anterior Skeleton allowing doctors to click directly on joints (Shoulders, Elbows, Wrists, Fingers, Hips, Knees, Toes) to record conditions.
+* **Color-coded Joint States:** Visually distinguish between Normal (Green), Tender (Red), Swollen (Blue), Tender & Swollen (Purple), and Limited Movement (Orange).
+* **Smart Visit History Calendar:** A dedicated Datepicker that highlights past patient visits with a green indicator. Selecting a past date locks the form into a secure Read-Only mode to protect historical clinical data.
+* **Quick Actions & JSON Storage:** Features like "Mark All Normal" for rapid assessment. The entire complex joint state is serialized securely into a single JSON object in the backend.
+
+*(Add Joint Assessment Screenshot here)*
+![Joint Assessment](screenshots/joint-assessment.png)
+
 ---
 
-## 🤖 4. Smart Hybrid AI Engine (Documents & Voice Dictation)
+## 📱 Core Modules Overview
+
+Here is a visual overview of the 5 core modules available in our EMR system:
+
+### 1. Dashboard
+![Dashboard Module](screenshots/module-dashboard.png)
+
+### 2. Patients
+![Patients Module](screenshots/module-patients.png)
+
+### 3. Appointments
+![Appointments Module](screenshots/module-appointments.png)
+
+### 4. Calendar
+![Calendar Module](screenshots/module-calendar.png)
+
+### 5. Doctors
+![Doctors Module](screenshots/module-doctors.png)
+
+---
+
+## 🤖 6. Smart Hybrid AI Engine (Documents & Voice Dictation)
 
 The core innovation of this EMR is its dual-flow intelligent data extraction system, capable of processing both physical medical records and live doctor dictations:
 
